@@ -1,6 +1,14 @@
 [build]
   publish = "."
 
+# Digital Asset Links for Android APK / TWA (Removes URL address bar)
+[[headers]]
+  for = "/.well-known/assetlinks.json"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
 # Service Worker must never be HTTP-cached so updates are detected immediately
 [[headers]]
   for = "/sw.js"

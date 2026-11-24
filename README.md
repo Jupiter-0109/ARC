@@ -181,6 +181,44 @@ Because ARC has **no build step, no bundlers, and no npm packages**, deploying t
 
 ---
 
+## How to Remove the Browser Address Bar in the APK (Digital Asset Links)
+
+When converting your PWA into an Android APK using **PWABuilder** (Trusted Web Activity), Android displays a browser URL bar at the top by default for security.
+
+To remove the address bar completely and achieve a 100% full-screen native app experience:
+
+### 1. The AssetLinks Requirement
+Android verifies that you own the website by requesting `https://<your-domain>/.well-known/assetlinks.json`.
+
+- When deploying to **Netlify** (e.g. `https://arc-retro.netlify.app`), the `/.well-known` folder is served automatically at the domain root with CORS headers configured in `netlify.toml`.
+- When deploying to **GitHub Pages**:
+  - The site must be hosted at a **root domain** (e.g. `https://<username>.github.io`), not a subpath (`https://<username>.github.io/arc/`), because Android strictly checks the root `.well-known` directory.
+  - The repository includes an empty `.nojekyll` file at the root, instructing GitHub Pages to serve hidden dotfolders like `.well-known`.
+
+### 2. Updating with your PWABuilder SHA-256 Fingerprint
+1. Package your app at [PWABuilder.com](https://www.pwabuilder.com/).
+2. On the Android APK download screen, PWABuilder provides your **Package Name** (e.g. `app.netlify.arc_retro.twa`) and your **SHA-256 certificate fingerprint**.
+3. Open [.well-known/assetlinks.json](file:///d:/ARC/.well-known/assetlinks.json) in your project.
+4. Replace `package_name` and `sha256_cert_fingerprints` with the values given by PWABuilder:
+   ```json
+   [
+     {
+       "relation": ["delegate_permission/common.handle_all_urls"],
+       "target": {
+         "namespace": "android_app",
+         "package_name": "app.netlify.arc_retro.twa",
+         "sha256_cert_fingerprints": [
+           "14:6D:E9:7F:0F:52:EA:4B:E5:43:8E:87:07:18:7B:3B:71:3F:65:8B:82:76:1E:20:C7:E0:F7:E2:4F:4A:04:1B"
+         ]
+       }
+     }
+   ]
+   ```
+5. Deploy or drag-and-drop the updated files to Netlify or GitHub Pages.
+6. Install the generated APK on your phone: Android will verify the asset links file and the address bar will vanish!
+
+---
+
 ## Manual Test Checklist
 
 Use this checklist to verify every feature:
