@@ -10,8 +10,10 @@
   <title>ARC // RETRO PRODUCTIVITY</title>
 
   <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
   <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
-  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/onboarding.css">
 </head>
@@ -434,7 +436,7 @@
         </div>
         <div class="setting-row">
           <span>Cache version:</span>
-          <strong id="cache-version-display">v1.3.1</strong>
+          <strong id="cache-version-display">v1.3.2</strong>
         </div>
       </section>
 
@@ -781,6 +783,17 @@
       </div>
     </div>
   </div>
+
+  <!-- Explicit Service Worker Registration for PWABuilder & App Stores -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('ARC SW ready:', reg.scope))
+          .catch((err) => console.warn('ARC SW reg error:', err));
+      });
+    }
+  </script>
 
   <!-- App Entry Script (ES Modules) -->
   <script type="module" src="js/app.js"></script>

@@ -1,15 +1,37 @@
 {
   "name": "ARC Productivity",
   "short_name": "ARC",
-  "description": "Simple retro-style personal productivity PWA",
-  "start_url": "./index.html",
-  "scope": "./",
+  "id": "/",
+  "description": "Simple retro-style personal productivity PWA with Pomodoro focus cycles, streaks, and ambient soundscapes",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F4ECD8",
   "theme_color": "#F4ECD8",
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "categories": ["productivity", "utilities"],
   "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "icons/icon-192.svg",
       "sizes": "192x192",
@@ -27,6 +49,22 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/screenshot-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "ARC Mobile Dashboard with Streak, Tasks, and Activity Heatmap"
+    },
+    {
+      "src": "icons/screenshot-desktop.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ARC Desktop Retro Focus Suite"
     }
   ]
 }

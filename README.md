@@ -2,10 +2,24 @@
 
 > Simple, tactile, offline-first personal productivity progressive web application with zero build step, zero dependencies, and an authentic 8-bit arcade aesthetic.
 
-![ARC Version](https://img.shields.io/badge/version-1.3.1-E0A526?style=flat-square)
+![ARC Version](https://img.shields.io/badge/version-1.3.2-E0A526?style=flat-square)
 ![PWA](https://img.shields.io/badge/PWA-Installable-2A9D8F?style=flat-square)
 ![Stack](https://img.shields.io/badge/stack-HTML%20%7C%20CSS%20%7C%20Vanilla%20ES%20Modules-D9534F?style=flat-square)
 ![Offline](https://img.shields.io/badge/offline-Service%20Worker%20%2B%20IndexedDB-2B2B2B?style=flat-square)
+
+---
+
+## What's New in v1.3.2 (PWABuilder & App Store Readiness)
+
+1. **Square High-Res PNG Icons (`icons/icon-192.png`, `icons/icon-512.png`, `icons/icon-maskable.png`)**:
+   - Generated genuine 192x192 PNG and 512x512 PNG icons with `purpose: "any"`.
+   - Generated 512x512 maskable PNG icon with a 20% safe zone margin for Android adaptive icon cropping.
+2. **App Store Showcase Screenshots (`icons/screenshot-mobile.png`, `icons/screenshot-desktop.png`)**:
+   - Added 750x1334 mobile screenshot (`form_factor: "narrow"`).
+   - Added 1280x800 desktop screenshot (`form_factor: "wide"`).
+3. **Explicit Service Worker Registration & Store Metadata**:
+   - Added direct Service Worker registration in `index.html` to satisfy PWABuilder's static scanner.
+   - Enhanced `manifest.webmanifest` with `id: "/"`, `start_url: "/"`, `scope: "/"`, `lang: "en"`, and `dir: "ltr"`.
 
 ---
 

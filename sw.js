@@ -4,7 +4,7 @@
  * and IndexedDB task completion on action click.
  */
 
-const CACHE_NAME = 'arc-cache-v1.3.1';
+const CACHE_NAME = 'arc-cache-v1.3.2';
 
 const PRECACHE_ASSETS = [
   './',
@@ -26,6 +26,11 @@ const PRECACHE_ASSETS = [
   './js/streak.js',
   './js/settings.js',
   './icons/favicon.svg',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/icon-maskable.png',
+  './icons/screenshot-mobile.png',
+  './icons/screenshot-desktop.png',
   './icons/icon-192.svg',
   './icons/icon-512.svg',
   './icons/icon-maskable.svg'
