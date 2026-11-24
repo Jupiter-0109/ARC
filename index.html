@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#F4ECD8" id="meta-theme-color">
+  <meta name="description" content="ARC - Simple retro-style personal productivity PWA">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ARC // RETRO PRODUCTIVITY</title>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/onboarding.css">
+</head>
+<body>
+  <!-- CRT Scanlines Overlay -->
+  <div class="scanlines-overlay" aria-hidden="true"></div>
+
+  <!-- App Wrapper -->
+  <div id="app-container">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="brand">
+        <img src="icons/favicon.svg" alt="ARC Logo" class="brand-logo" width="24" height="24">
+        <h1 class="brand-title">ARC</h1>
+      </div>
+      <div class="top-bar-stats">
+        <div class="live-clock" id="live-clock" aria-label="Current time">--:--</div>
+        <button id="quick-theme-btn" class="btn btn-sm btn-icon" title="Toggle Theme" aria-label="Toggle Theme" data-tour="quick-theme">
+          CRT
+        </button>
+      </div>
+    </header>
+
+    <!-- Update Available Banner -->
+    <aside id="update-banner" class="update-banner" role="alert">
+      <span>NEW SYSTEM UPDATE DETECTED</span>
+      <button id="update-reload-btn" class="btn btn-sm">RELOAD</button>
+    </aside>
+
+    <!-- ======================================================================
+         HOME TAB VIEW
+         ====================================================================== -->
+    <main id="view-home" class="tab-view active" role="tabpanel" aria-labelledby="tab-btn-home">
+      
+      <!-- 1. Pinned WHY Note -->
+      <section class="sticky-why-card retro-card" id="why-card" tabindex="0" role="button" aria-label="Edit your Why note" data-tour="why-card">
+        <div class="why-header">
+          <span>// YOUR WHY</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span>[TAP TO EDIT]</span>
+            <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+          </div>
+        </div>
+        <p class="why-text" id="why-text">FOCUS ON THE ARC. MAKE EVERY TICK COUNT.</p>
+        <span class="why-tap-hint" id="why-char-count">43 / 200</span>
+      </section>
+
+      <!-- 2. Arc Countdown Card -->
+      <section class="retro-card" id="arc-card" data-tour="arc-card">
+        <div class="card-header">
+          <h2 class="card-title" id="arc-name-display">ARC COUNTDOWN</h2>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button id="edit-arc-btn" class="btn btn-sm" aria-label="Edit Arc Dates">EDIT ARC</button>
+            <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+          </div>
+        </div>
+        <div class="arc-meta">
+          <span class="arc-days-left" id="arc-days-left">-- DAYS LEFT</span>
+          <span class="arc-day-ratio" id="arc-day-ratio">DAY -- / --</span>
+        </div>
+        <div class="pixel-bar-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="arc-progress-bar">
+          <div class="pixel-bar-fill" id="arc-progress-fill" style="width: 0%;"></div>
+        </div>
+        <div id="arc-ended-box" style="display: none; margin-top: 4px;">
+          <button id="start-new-arc-btn" class="btn btn-primary" style="width: 100%;">START NEW ARC</button>
+        </div>
+      </section>
+
+      <!-- 3. Streak Counter Card -->
+      <section class="retro-card" id="streak-card" data-tour="streak-card">
+        <div class="card-header">
+          <h2 class="card-title">PRODUCTIVITY STREAK</h2>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <span class="streak-status-badge" id="streak-status-badge">NOT MET TODAY</span>
+            <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+          </div>
+        </div>
+        <div class="streak-row">
+          <div class="streak-counter-box">
+            <span class="flame-icon" aria-hidden="true">&#x1F525;</span>
+            <div class="streak-numbers">
+              <span class="streak-current" id="streak-current-count">0 DAYS</span>
+              <span class="streak-best" id="streak-best-count">BEST: 0 DAYS</span>
+            </div>
+          </div>
+        </div>
+        <p style="font-size: 15px; color: var(--ink-dim);">Rule: Complete at least 1 task OR 1 focus session daily.</p>
+      </section>
+
+      <!-- 4. Main Goals Card (1-5 Goals) -->
+      <section class="retro-card" id="goals-card" data-tour="goals-card">
+        <div class="card-header">
+          <h2 class="card-title">MAIN GOALS (<span id="goals-count-badge">0/5</span>)</h2>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button id="add-goal-btn" class="btn btn-sm btn-primary" aria-label="Add New Goal">+ GOAL</button>
+            <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+          </div>
+        </div>
+        <div class="goal-list" id="goal-list" role="list">
+          <!-- Dynamically populated -->
+        </div>
+        <div class="retro-empty-state" id="goals-empty-state" style="display: none;">
+          NO GOALS DEFINED. TAP [+ GOAL] TO SET YOUR TARGETS.
+        </div>
+      </section>
+
+      <!-- 5. Today's Tasks Card -->
+      <section class="retro-card" id="tasks-card" data-tour="tasks-card">
+        <div class="card-header">
+          <div class="task-controls-header">
+            <h2 class="card-title" id="today-date-label">TODAY</h2>
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button id="rollover-tasks-btn" class="btn btn-sm" title="Move unfinished tasks to tomorrow">ROLL OVER UNFINISHED</button>
+            <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+          </div>
+        </div>
+
+        <div class="task-list" id="task-list" role="list">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="retro-empty-state" id="tasks-empty-state" style="display: none;">
+          NO TASKS. ENJOY THE SILENCE.
+        </div>
+
+        <!-- Quick Add Form -->
+        <form id="quick-add-form" class="quick-add-form" autocomplete="off">
+          <input type="text" id="quick-add-input" class="quick-add-input" placeholder="Type new task & press Enter..." aria-label="New task title" maxlength="120" required>
+          <button type="submit" class="btn btn-primary" aria-label="Add task">+ ADD</button>
+        </form>
+      </section>
+
+      <!-- 6. Activity Heatmap Card -->
+      <section class="retro-card" id="heatmap-card" data-tour="heatmap-card">
+        <div class="card-header">
+          <h2 class="card-title">ACTIVITY HEATMAP (16 WEEKS)</h2>
+          <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+        </div>
+        <div class="heatmap-wrapper">
+          <svg id="heatmap-svg" class="heatmap-svg" width="100%" height="130" role="img" aria-label="Activity Heatmap showing tasks and focus sessions"></svg>
+        </div>
+        <div class="heatmap-tooltip" id="heatmap-tooltip">Tap a square to inspect activity</div>
+        <div class="heatmap-legend" aria-label="Heatmap intensity legend">
+          <span>LESS</span>
+          <div class="heatmap-legend-cell heatmap-cell level-0"></div>
+          <div class="heatmap-legend-cell heatmap-cell level-1"></div>
+          <div class="heatmap-legend-cell heatmap-cell level-2"></div>
+          <div class="heatmap-legend-cell heatmap-cell level-3"></div>
+          <div class="heatmap-legend-cell heatmap-cell level-4"></div>
+          <span>MORE</span>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ======================================================================
+         FOCUS TAB VIEW
+         ====================================================================== -->
+    <main id="view-focus" class="tab-view" role="tabpanel" aria-labelledby="tab-btn-focus">
+      
+      <div class="focus-container">
+        <!-- Phase Badge -->
+        <div class="focus-phase-badge" id="focus-phase-badge">FOCUS SESSION #1</div>
+
+        <!-- Linked Task Selector -->
+        <div class="focus-task-picker">
+          <label for="focus-task-select" class="form-label" style="display:block; margin-bottom:4px;">LINKED TASK (OPTIONAL):</label>
+          <select id="focus-task-select" class="focus-select" aria-label="Select task for focus session">
+            <option value="">-- No specific task --</option>
+          </select>
+        </div>
+
+        <!-- Big Countdown Timer Display -->
+        <div class="timer-display-box" data-tour="focus-timer">
+          <div class="timer-digits" id="timer-display" aria-live="polite">25:00</div>
+          <div class="timer-linked-task" id="timer-current-task-name">GENERAL FOCUS</div>
+          
+          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 4px;">
+            <div class="wake-lock-status" id="wake-lock-status">
+              <span id="wake-lock-dot">&#x25CF;</span>
+              <span id="wake-lock-text">WAKE LOCK STANDBY</span>
+            </div>
+            <span id="shield-session-leaves-badge" style="font-family: var(--font-heading); font-size: 9px; color: var(--ink-dim);">LEAVES: 0</span>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="timer-controls">
+          <button id="timer-start-btn" class="btn btn-primary" aria-label="Start timer">START</button>
+          <button id="timer-pause-btn" class="btn" aria-label="Pause timer" disabled>PAUSE</button>
+          <button id="timer-reset-btn" class="btn" aria-label="Reset timer">RESET</button>
+          <button id="timer-skip-btn" class="btn" aria-label="Skip to next phase">SKIP</button>
+        </div>
+
+        <!-- Today Focus Summary -->
+        <div class="retro-card" style="width: 100%;" data-tour="focus-log">
+          <div class="card-header">
+            <h2 class="card-title">TODAY'S FOCUS LOG</h2>
+            <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+          </div>
+          <div class="focus-summary-stats">
+            <div>TOTAL: <strong id="focus-today-mins">0</strong> MIN</div>
+            <div>COMPLETED: <strong id="focus-today-count">0</strong> SESSIONS</div>
+          </div>
+        </div>
+
+        <!-- Ambient Soundscape Generator Card (Procedural Web Audio) -->
+        <div class="retro-card" id="ambient-sound-card" style="width: 100%;" data-tour="ambient-sound">
+          <div class="card-header">
+            <h2 class="card-title">&#x1F3A7; AMBIENT NOISE (PROCEDURAL)</h2>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <label for="focus-ambient-toggle" style="font-size: 14px; cursor: pointer;">AUTO-PLAY:</label>
+              <input type="checkbox" id="focus-ambient-toggle" class="retro-checkbox" aria-label="Toggle ambient noise during focus">
+              <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+            </div>
+          </div>
+          <p style="font-size: 15px; color: var(--ink-dim); margin-top: 2px;">
+            Synthesizes offline focus noise. Plays during active focus; auto-pauses on breaks.
+          </p>
+          <div class="setting-row" style="margin-top: 6px; flex-wrap: wrap; gap: 8px;">
+            <div class="form-group" style="flex: 1.2; min-width: 180px;">
+              <label for="focus-ambient-preset" class="form-label" style="font-size: 15px;">SOUNDSCAPE:</label>
+              <select id="focus-ambient-preset" class="form-select" style="font-size: 16px;">
+                <option value="tape_hiss">&#x1F4FC; CRT Hum &amp; Tape Hiss</option>
+                <option value="rain">&#x1F327; 8-Bit Rainy Night</option>
+                <option value="brown">&#x1F30C; Deep Space Brown Noise</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 0.8; min-width: 140px;">
+              <label for="focus-ambient-vol" class="form-label" style="font-size: 15px;">VOLUME: <strong id="focus-ambient-vol-label">40%</strong></label>
+              <input type="range" id="focus-ambient-vol" class="retro-range" min="0" max="100" value="40" aria-label="Ambient volume slider">
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 6px;">
+            <button id="focus-ambient-preview-btn" class="btn btn-sm" style="flex: 1;">TEST PLAY</button>
+          </div>
+        </div>
+
+        <!-- Focus Shield Card Mount Container -->
+        <div id="shield-card-container" style="width: 100%;" data-tour="focus-shield"></div>
+      </div>
+
+    </main>
+
+    <!-- ======================================================================
+         SETTINGS TAB VIEW
+         ====================================================================== -->
+    <main id="view-settings" class="tab-view" role="tabpanel" aria-labelledby="tab-btn-settings">
+      
+      <!-- Theme Selection -->
+      <section class="retro-card settings-group">
+        <div class="card-header">
+          <h2 class="card-title">APPEARANCE & THEME</h2>
+          <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+        </div>
+        <div class="theme-options-grid">
+          <button class="btn theme-btn active" data-theme-choice="paper">PAPER</button>
+          <button class="btn theme-btn" data-theme-choice="crt-green">CRT GREEN</button>
+          <button class="btn theme-btn" data-theme-choice="crt-amber">CRT AMBER</button>
+        </div>
+        <div class="setting-row" style="margin-top: 6px;">
+          <label for="toggle-scanlines" class="setting-label">CRT Scanline Overlay</label>
+          <input type="checkbox" id="toggle-scanlines" class="retro-checkbox">
+        </div>
+      </section>
+
+      <!-- Arc Settings -->
+      <section class="retro-card settings-group">
+        <div class="card-header">
+          <h2 class="card-title">CURRENT ARC CONFIG</h2>
+          <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+        </div>
+        <div class="form-group">
+          <label for="setting-arc-title" class="form-label">ARC TITLE:</label>
+          <input type="text" id="setting-arc-title" class="form-input" maxlength="40">
+        </div>
+        <div class="setting-row">
+          <div class="form-group" style="flex: 1;">
+            <label for="setting-arc-start" class="form-label">START DATE:</label>
+            <input type="date" id="setting-arc-start" class="form-input">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label for="setting-arc-end" class="form-label">END DATE:</label>
+            <input type="date" id="setting-arc-end" class="form-input">
+          </div>
+        </div>
+        <button id="save-arc-settings-btn" class="btn btn-primary">SAVE ARC DATES</button>
+      </section>
+
+      <!-- Pomodoro Settings -->
+      <section class="retro-card settings-group">
+        <div class="card-header">
+          <h2 class="card-title">POMODORO CONFIG</h2>
+          <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+        </div>
+        <div class="setting-row">
+          <label for="setting-pomo-focus" class="setting-label">Focus duration (min):</label>
+          <input type="number" id="setting-pomo-focus" class="setting-input" min="1" max="120" value="25" style="width: 70px;">
+        </div>
+        <div class="setting-row">
+          <label for="setting-pomo-short" class="setting-label">Short break (min):</label>
+          <input type="number" id="setting-pomo-short" class="setting-input" min="1" max="60" value="5" style="width: 70px;">
+        </div>
+        <div class="setting-row">
+          <label for="setting-pomo-long" class="setting-label">Long break (min):</label>
+          <input type="number" id="setting-pomo-long" class="setting-input" min="1" max="60" value="15" style="width: 70px;">
+        </div>
+        <div class="setting-row">
+          <label for="setting-pomo-rounds" class="setting-label">Rounds before long break:</label>
+          <input type="number" id="setting-pomo-rounds" class="setting-input" min="1" max="12" value="4" style="width: 70px;">
+        </div>
+        <button id="save-pomo-settings-btn" class="btn">SAVE POMODORO SETTINGS</button>
+      </section>
+
+      <!-- Sound & Audio Settings -->
+      <section class="retro-card settings-group" data-tour="settings-sounds">
+        <div class="card-header">
+          <h2 class="card-title">SESSION SOUNDS</h2>
+          <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+        </div>
+        <div class="setting-row">
+          <label for="setting-sound-enable" class="setting-label">Sound alerts enabled:</label>
+          <input type="checkbox" id="setting-sound-enable" class="retro-checkbox" checked>
+        </div>
+        <div class="form-group">
+          <label for="setting-sound-choice" class="form-label">CHIME SOUND PRESET:</label>
+          <select id="setting-sound-choice" class="form-select">
+            <option value="chime">Chime (Ascending Arpeggio)</option>
+            <option value="bell">Bell (Resonant Strike)</option>
+            <option value="retro">Retro 8-bit (Arcade Fanfare)</option>
+            <option value="marimba">Soft Marimba (Wooden Pluck)</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label for="setting-sound-volume" class="setting-label">Volume: <strong id="setting-sound-volume-val">80%</strong></label>
+        </div>
+        <input type="range" id="setting-sound-volume" min="0" max="100" value="80" class="retro-range" aria-label="Sound volume">
+        <div class="setting-row" style="margin-top: 4px;">
+          <label for="setting-sound-repeat" class="setting-label">Repeat until dismissed (3x, 5s apart):</label>
+          <input type="checkbox" id="setting-sound-repeat" class="retro-checkbox" checked>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 4px;">
+          <button id="preview-sound-btn" class="btn btn-sm" style="flex: 1;">PREVIEW CHIME</button>
+          <button id="preview-break-sound-btn" class="btn btn-sm" style="flex: 1;">PREVIEW BREAK</button>
+        </div>
+      </section>
+
+      <!-- Focus Shield Settings -->
+      <section class="retro-card settings-group">
+        <div class="card-header">
+          <h2 class="card-title">FOCUS SHIELD CONFIG</h2>
+          <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+        </div>
+        <div class="setting-row">
+          <label for="setting-shield-strict" class="setting-label">Strict mode (breaks session if exceeded):</label>
+          <input type="checkbox" id="setting-shield-strict" class="retro-checkbox">
+        </div>
+        <div class="setting-row">
+          <label for="setting-shield-max-leaves" class="setting-label">Max allowed leaves before broken:</label>
+          <input type="number" id="setting-shield-max-leaves" class="setting-input" min="1" max="10" value="3" style="width: 70px;">
+        </div>
+        <div class="setting-row">
+          <label for="setting-shield-notify-away" class="setting-label">Notification after 30s away:</label>
+          <input type="checkbox" id="setting-shield-notify-away" class="retro-checkbox" checked>
+        </div>
+        <button id="save-shield-settings-btn" class="btn">SAVE SHIELD CONFIG</button>
+      </section>
+
+      <!-- Daily Notification Settings -->
+      <section class="retro-card settings-group" data-tour="settings-reminders">
+        <div class="card-header">
+          <h2 class="card-title">DAILY REMINDERS</h2>
+          <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+        </div>
+        <div class="setting-row">
+          <label for="setting-daily-reminder-enable" class="setting-label">"Plan your day" reminder:</label>
+          <input type="checkbox" id="setting-daily-reminder-enable" class="retro-checkbox">
+        </div>
+        <div class="setting-row">
+          <label for="setting-daily-reminder-time" class="setting-label">Reminder time:</label>
+          <input type="time" id="setting-daily-reminder-time" class="setting-input" value="09:00">
+        </div>
+        <button id="test-notification-btn" class="btn btn-sm">TEST NOTIFICATION / SOUND</button>
+
+        <div class="honesty-notice" role="note">
+          &#x26A0; Note: Reminders are most reliable while the app is open or recently used. Android may delay background alerts.
+        </div>
+      </section>
+
+      <!-- Backup & Restore -->
+      <section class="retro-card settings-group" data-tour="settings-backup">
+        <div class="card-header">
+          <h2 class="card-title">DATA BACKUP & RESTORE</h2>
+          <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+        </div>
+        <p style="font-size: 16px; color: var(--ink-dim);">Browser storage can be cleared by the OS. Export regular JSON backups.</p>
+        <div style="display: flex; gap: 8px;">
+          <button id="export-backup-btn" class="btn btn-primary" style="flex: 1;">EXPORT JSON</button>
+          <button id="import-backup-btn" class="btn" style="flex: 1;">IMPORT JSON</button>
+          <input type="file" id="import-backup-input" accept=".json" style="display: none;">
+        </div>
+        <button id="replay-tour-btn" class="btn btn-sm" style="margin-top: 6px; width: 100%;">REPLAY TUTORIAL</button>
+        <button id="reset-all-data-btn" class="btn btn-danger" style="margin-top: 6px;">RESET ALL DATA</button>
+      </section>
+
+      <!-- App & System Status -->
+      <section class="retro-card settings-group">
+        <div class="card-header">
+          <h2 class="card-title">PWA SYSTEM STATUS</h2>
+          <button class="btn btn-sm btn-icon section-refresh-btn" title="Refresh entire app" aria-label="Refresh entire app"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"/><path d="M8 0l3 2.5-3 2.5V0z"/></svg></button>
+        </div>
+        <div class="setting-row">
+          <span>PWA Installation:</span>
+          <button id="install-pwa-btn" class="btn btn-sm btn-primary">INSTALL APP</button>
+        </div>
+        <div class="setting-row">
+          <span>Network state:</span>
+          <strong id="network-status-display">ONLINE</strong>
+        </div>
+        <div class="setting-row">
+          <span>Cache version:</span>
+          <strong id="cache-version-display">v1.3.1</strong>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ======================================================================
+         BOTTOM NAVIGATION BAR
+         ====================================================================== -->
+    <nav class="bottom-nav" role="tablist" aria-label="Main Navigation" data-tour="bottom-nav">
+      <button class="nav-tab active" id="tab-btn-home" role="tab" aria-selected="true" aria-controls="view-home">
+        <span class="nav-tab-icon" aria-hidden="true">&#x25A3;</span>
+        <span>HOME</span>
+      </button>
+      <button class="nav-tab" id="tab-btn-focus" role="tab" aria-selected="false" aria-controls="view-focus">
+        <span class="nav-tab-icon" aria-hidden="true">&#x23F1;</span>
+        <span>FOCUS</span>
+      </button>
+      <button class="nav-tab" id="tab-btn-settings" role="tab" aria-selected="false" aria-controls="view-settings">
+        <span class="nav-tab-icon" aria-hidden="true">&#x2699;</span>
+        <span>SETTINGS</span>
+      </button>
+    </nav>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" aria-live="assertive"></div>
+  </div>
+
+  <!-- ======================================================================
+       MODALS & DIALOGS
+       ====================================================================== -->
+
+  <!-- 1. Edit WHY Modal -->
+  <div class="modal-backdrop" id="modal-why" role="dialog" aria-modal="true" aria-labelledby="modal-why-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-why-title">// EDIT YOUR WHY</h3>
+        <button class="btn btn-sm btn-icon close-modal-btn" aria-label="Close modal">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="modal-why-input" class="form-label">Core purpose (max 200 chars):</label>
+          <textarea id="modal-why-input" class="form-textarea" maxlength="200" rows="3"></textarea>
+          <span style="font-size: 14px; color: var(--ink-dim); text-align: right;" id="modal-why-counter">0 / 200</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn close-modal-btn">CANCEL</button>
+        <button id="save-why-btn" class="btn btn-primary">SAVE WHY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Task Modal (Add/Edit) -->
+  <div class="modal-backdrop" id="modal-task" role="dialog" aria-modal="true" aria-labelledby="modal-task-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-task-title">// TASK DETAILS</h3>
+        <button class="btn btn-sm btn-icon close-modal-btn" aria-label="Close modal">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="modal-task-id">
+        <div class="form-group">
+          <label for="modal-task-title-input" class="form-label">TITLE:</label>
+          <input type="text" id="modal-task-title-input" class="form-input" required maxlength="120">
+        </div>
+        <div class="form-group">
+          <label for="modal-task-date-input" class="form-label">DATE:</label>
+          <input type="date" id="modal-task-date-input" class="form-input">
+        </div>
+        <div class="setting-row">
+          <div class="form-group" style="flex: 1;">
+            <label for="modal-task-time-input" class="form-label">TIME (OPTIONAL):</label>
+            <input type="time" id="modal-task-time-input" class="form-input">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label for="modal-task-goal-select" class="form-label">LINKED GOAL:</label>
+            <select id="modal-task-goal-select" class="form-select">
+              <option value="">-- None --</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="modal-task-reminder-input" class="form-label">REMINDER DATE & TIME:</label>
+          <input type="datetime-local" id="modal-task-reminder-input" class="form-input">
+          <span style="font-size: 14px; color: var(--ink-dim);">Leave blank if no reminder needed</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="delete-task-modal-btn" class="btn btn-danger" style="margin-right: auto; display: none;">DELETE</button>
+        <button class="btn close-modal-btn">CANCEL</button>
+        <button id="save-task-btn" class="btn btn-primary">SAVE TASK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Goal Modal (Add/Edit) -->
+  <div class="modal-backdrop" id="modal-goal" role="dialog" aria-modal="true" aria-labelledby="modal-goal-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-goal-title">// GOAL DETAILS</h3>
+        <button class="btn btn-sm btn-icon close-modal-btn" aria-label="Close modal">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="modal-goal-id">
+        <div class="form-group">
+          <label for="modal-goal-title-input" class="form-label">GOAL TITLE:</label>
+          <input type="text" id="modal-goal-title-input" class="form-input" required maxlength="60">
+        </div>
+        <div class="form-group">
+          <label for="modal-goal-desc-input" class="form-label">DESCRIPTION (OPTIONAL):</label>
+          <textarea id="modal-goal-desc-input" class="form-textarea" rows="2" maxlength="160"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="delete-goal-modal-btn" class="btn btn-danger" style="margin-right: auto; display: none;">DELETE</button>
+        <button class="btn close-modal-btn">CANCEL</button>
+        <button id="save-goal-btn" class="btn btn-primary">SAVE GOAL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Retro Notification Permission Dialog -->
+  <div class="modal-backdrop" id="modal-permission" role="dialog" aria-modal="true" aria-labelledby="modal-perm-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-perm-title">// SYSTEM ALERT PERMISSION</h3>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 18px; line-height: 1.3;">
+          ARC uses notifications to trigger task reminders, daily planning alerts, and focus timer bell chimes on your device.
+        </p>
+        <p style="font-size: 16px; color: var(--ink-dim);">
+          No spam. Offline only. Would you like to enable system notifications?
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button id="permission-deny-btn" class="btn">LATER</button>
+        <button id="permission-allow-btn" class="btn btn-primary">ALLOW NOTIFICATIONS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Generic Confirmation Modal -->
+  <div class="modal-backdrop" id="modal-confirm" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-confirm-title">// CONFIRM ACTION</h3>
+      </div>
+      <div class="modal-body">
+        <p id="modal-confirm-message" style="font-size: 18px; line-height: 1.3;"></p>
+      </div>
+      <div class="modal-actions">
+        <button id="modal-confirm-cancel" class="btn">CANCEL</button>
+        <button id="modal-confirm-proceed" class="btn btn-danger">CONFIRM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Session Complete In-App Modal -->
+  <div class="modal-backdrop" id="modal-session-complete" role="dialog" aria-modal="true" aria-labelledby="modal-complete-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-complete-title">// SESSION COMPLETE!</h3>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <div style="font-size: 40px; margin: 4px 0;">&#x1F3C6;</div>
+        <p id="modal-complete-message" style="font-size: 20px; line-height: 1.3;">
+          FOCUS SESSION FINISHED! EXCELLENT WORK.
+        </p>
+        <p id="modal-complete-submessage" style="font-size: 16px; color: var(--ink-dim);">
+          Session saved to your streak and heatmap.
+        </p>
+      </div>
+      <div class="modal-actions" style="justify-content: center;">
+        <button id="session-complete-action-btn" class="btn btn-primary" style="min-width: 160px;">TAKE BREAK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Focus Shield Leave Warning Modal -->
+  <div class="modal-backdrop" id="modal-shield-warning" role="dialog" aria-modal="true" aria-labelledby="shield-warning-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="shield-warning-title" style="color: var(--tomato);">// DISTRACTION WARNING</h3>
+      </div>
+      <div class="modal-body">
+        <p id="shield-warning-message" style="font-size: 20px; font-weight: bold;"></p>
+        <p id="shield-warning-details" style="font-size: 16px; color: var(--ink-dim); line-height: 1.3;"></p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary close-modal-btn">RETURN TO FOCUS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Focus Shield Cooldown Modal (Friction Prompt) -->
+  <div class="modal-backdrop" id="modal-shield-cooldown" role="dialog" aria-modal="true" aria-labelledby="shield-cooldown-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="shield-cooldown-title" style="color: var(--tomato);">// ACTIVE FOCUS COOLDOWN</h3>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 18px; line-height: 1.3;">
+          FOCUS SESSION ACTIVE. ARE YOU SURE YOU WANT TO OPEN <strong id="shield-cooldown-app-name">APP</strong>?
+        </p>
+        <div class="cooldown-timer-box" id="shield-cooldown-timer">10s</div>
+        <p style="font-size: 15px; color: var(--ink-dim);">
+          Take a breath. Distractions break momentum. Opening this app will be logged.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button id="shield-cooldown-cancel" class="btn">STAY FOCUSED</button>
+        <button id="shield-cooldown-confirm" class="btn btn-danger" disabled>WAIT (10S)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Focus Shield Active Budget Modal -->
+  <div class="modal-backdrop" id="modal-shield-budget" role="dialog" aria-modal="true" aria-labelledby="budget-modal-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="budget-modal-title">// ALLOWED USE: <span id="budget-modal-app-name">APP</span></h3>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <p style="font-size: 16px; color: var(--ink-dim);">REMAINING DAILY BUDGET:</p>
+        <div id="budget-modal-countdown" style="font-family: var(--font-heading); font-size: 36px; margin: 10px 0; color: var(--teal);">
+          --:--
+        </div>
+        <p style="font-size: 15px; color: var(--ink-dim);">
+          When you finish using the app, tap DONE below to record your time.
+        </p>
+      </div>
+      <div class="modal-actions" style="justify-content: center;">
+        <button id="budget-modal-done-btn" class="btn btn-primary" style="min-width: 160px;">DONE (LOG TIME)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. Add Distraction App Modal -->
+  <div class="modal-backdrop" id="modal-add-distraction" role="dialog" aria-modal="true" aria-labelledby="modal-add-app-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-add-app-title">// ADD DISTRACTION APP</h3>
+        <button class="btn btn-sm btn-icon close-modal-btn" aria-label="Close modal">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="preset-app-select" class="form-label">CHOOSE FROM PRESETS:</label>
+          <select id="preset-app-select" class="form-select">
+            <option value="">-- Choose Preset or type custom below --</option>
+            <option value="Instagram|15">Instagram (15 min)</option>
+            <option value="YouTube|30">YouTube (30 min)</option>
+            <option value="X (Twitter)|15">X / Twitter (15 min)</option>
+            <option value="Facebook|15">Facebook (15 min)</option>
+            <option value="TikTok|15">TikTok (15 min)</option>
+            <option value="Snapchat|10">Snapchat (10 min)</option>
+            <option value="Reddit|20">Reddit (20 min)</option>
+            <option value="WhatsApp|20">WhatsApp (20 min)</option>
+            <option value="Netflix|30">Netflix (30 min)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="custom-app-name-input" class="form-label">OR CUSTOM APP NAME:</label>
+          <input type="text" id="custom-app-name-input" class="form-input" placeholder="e.g. Games, Discord" maxlength="30">
+        </div>
+        <div class="form-group">
+          <label for="custom-app-limit-input" class="form-label">DAILY LIMIT (MINUTES):</label>
+          <input type="number" id="custom-app-limit-input" class="form-input" min="1" max="300" value="15">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn close-modal-btn">CANCEL</button>
+        <button id="save-distraction-app-btn" class="btn btn-primary">ADD APP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. Reality Check Helper Modal (Digital Wellbeing Instructions) -->
+  <div class="modal-backdrop" id="modal-digital-wellbeing" role="dialog" aria-modal="true" aria-labelledby="dw-modal-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="dw-modal-title">// REAL SYSTEM BLOCKING</h3>
+        <button class="btn btn-sm btn-icon close-modal-btn" aria-label="Close modal">&#x2715;</button>
+      </div>
+      <div class="modal-body" style="font-size: 16px; line-height: 1.35;">
+        <p style="font-weight: bold; color: var(--mustard);">
+          Android / OS Hard Blocking Setup:
+        </p>
+        <p>
+          A Progressive Web App runs inside a browser sandbox and cannot block or quit native OS apps. For true OS-enforced app lockouts:
+        </p>
+        <ol style="margin-left: 18px; display: flex; flex-direction: column; gap: 6px;">
+          <li>Open your phone's <strong>Settings</strong> app.</li>
+          <li>Tap <strong>Digital Wellbeing &amp; parental controls</strong>.</li>
+          <li>Tap <strong>App timers</strong> $\rightarrow$ set strict daily limits on distracting apps (Instagram, YouTube, etc.).</li>
+          <li>Tap <strong>Focus mode</strong> $\rightarrow$ configure work schedules to pause and hide distracting apps while ARC runs.</li>
+        </ol>
+        <div class="honesty-notice" style="margin-top: 8px;">
+          Use ARC's Focus Shield for mindfulness, session leave accountability, and self-reported budgets, and Digital Wellbeing for hard OS restrictions.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary close-modal-btn">UNDERSTOOD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Onboarding Welcome Modal -->
+  <div class="modal-backdrop" id="modal-tour-welcome" role="dialog" aria-modal="true" aria-labelledby="modal-tour-welcome-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-tour-welcome-title">// WELCOME TO ARC</h3>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 21px; line-height: 1.3; margin-bottom: 8px;">
+          ARC is an offline, tactile productivity PWA designed around long-term focus cycles, daily streaks, and distraction accountability.
+        </p>
+        <p style="font-size: 17px; color: var(--ink-dim);">
+          Would you like a quick interactive walkthrough of all the retro features?
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button id="tour-welcome-skip-btn" class="btn">SKIP, I'LL EXPLORE</button>
+        <button id="tour-welcome-start-btn" class="btn btn-primary">TAKE THE TOUR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Onboarding What's New Mini-Tour Modal -->
+  <div class="modal-backdrop" id="modal-tour-whats-new" role="dialog" aria-modal="true" aria-labelledby="modal-tour-whats-new-title">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-tour-whats-new-title">// WHAT'S NEW IN ARC</h3>
+        <span class="streak-status-badge" id="whats-new-step-count">NEW</span>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 21px; line-height: 1.3; margin-bottom: 8px;">
+          New retro capabilities have been added since your last visit. Take a brief update tour?
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button id="tour-whats-new-skip-btn" class="btn">DISMISS</button>
+        <button id="tour-whats-new-start-btn" class="btn btn-primary">TAKE MINI-TOUR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Entry Script (ES Modules) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
